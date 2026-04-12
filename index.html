@@ -37,7 +37,7 @@ button{
 
 <h2>💎 ALF Wallet</h2>
 
-<button onclick="login()">Login (Email)</button>
+<button onclick="login()">Connect Wallet</button>
 
 <div class="card">
 <p><b>Address:</b></p>
@@ -51,34 +51,29 @@ button{
 
 <button onclick="getBalance()">Refresh Balance</button>
 
-<script type="module">
-import { createThirdwebClient } from "https://esm.sh/thirdweb";
-import { inAppWallet } from "https://esm.sh/thirdweb/wallets";
-
-const client = createThirdwebClient({
-  clientId: "e9a42a2893fb449bf0dab85870b54806"
-});
-
-// 🔥 embedded wallet
-const wallet = inAppWallet();
-
+<script>
+let provider;
+let signer;
 let userAddress;
 
-// LOGIN FIXED
-window.login = async function(){
-  await wallet.connect({
-    client,
-    strategy: "email"
-  });
+// 🔗 CONNECT WALLET (MetaMask)
+async function login(){
+  if (window.ethereum) {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = provider.getSigner();
 
-  userAddress = await wallet.getAddress();
-  document.getElementById("address").innerText = userAddress;
+    userAddress = await signer.getAddress();
+    document.getElementById("address").innerText = userAddress;
+  } else {
+    alert("Install MetaMask");
+  }
 }
 
-// GET BALANCE
-window.getBalance = async function(){
+// 💰 GET BALANCE
+async function getBalance(){
   if(!userAddress){
-    alert("Login kwanza");
+    alert("Connect wallet kwanza");
     return;
   }
 
