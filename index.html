@@ -53,16 +53,21 @@ button{
 
 <script type="module">
 import { createThirdwebClient } from "https://esm.sh/thirdweb";
+import { inAppWallet } from "https://esm.sh/thirdweb/wallets";
 
 const client = createThirdwebClient({
   clientId: "e9a42a2893fb449bf0dab85870b54806"
 });
 
-let wallet;
+// 🔥 embedded wallet
+const wallet = inAppWallet();
+
 let userAddress;
 
+// LOGIN FIXED
 window.login = async function(){
-  wallet = await client.wallet.connect({
+  await wallet.connect({
+    client,
     strategy: "email"
   });
 
@@ -70,6 +75,7 @@ window.login = async function(){
   document.getElementById("address").innerText = userAddress;
 }
 
+// GET BALANCE
 window.getBalance = async function(){
   if(!userAddress){
     alert("Login kwanza");
