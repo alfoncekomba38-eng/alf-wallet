@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALF Wallet</title>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
+<style>
+body{
+  font-family: Arial;
+  background:#0c0f1a;
+  color:#fff;
+  text-align:center;
+  padding:20px;
+}
+button{
+  padding:12px;
+  margin:10px;
+  border:none;
+  border-radius:8px;
+  background:#4f6ef7;
+  color:#fff;
+  width:80%;
+}
+.card{
+  background:#1a1f2e;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>💎 ALF Wallet</h2>
+
+<button onclick="login()">Login (Email)</button>
+
+<div class="card">
+<p><b>Address:</b></p>
+<p id="address">Not connected</p>
+</div>
+
+<div class="card">
+<p><b>Balance:</b></p>
+<p id="balance">0 ALF</p>
+</div>
+
+<button onclick="getBalance()">Refresh Balance</button>
+
+<script type="module">
+import { createThirdwebClient } from "https://esm.sh/thirdweb";
+
+const client = createThirdwebClient({
+  clientId: "e9a42a2893fb449bf0dab85870b54806"
+});
+
+let wallet;
+let userAddress;
+
+window.login = async function(){
+  wallet = await client.wallet.connect({
+    strategy: "email"
+  });
+
+  userAddress = await wallet.getAddress();
+  document.getElementById("address").innerText = userAddress;
+}
+
+window.getBalance = async function(){
+  if(!userAddress){
+    alert("Login kwanza");
+    return;
+  }
+
+  const provider = new ethers.providers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+
+  const tokenAddress = "0xEf9c435DC813d4839fdC4b4195C4B3E4F5d3D2F5";
+
+  const abi = [
+    "function balanceOf(address owner) view returns (uint256)"
+  ];
+
+  const contract = new ethers.Contract(tokenAddress, abi, provider);
+
+  let balance = await contract.balanceOf(userAddress);
+  balance = ethers.utils.formatUnits(balance, 18);
+
+  document.getElementById("balance").innerText = balance + " ALF";
+}
+</script>
+
+</body>
+</html>
